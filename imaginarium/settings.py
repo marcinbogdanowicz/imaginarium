@@ -21,12 +21,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure--1pks29iyhmtof*z-9f6zsa7rov8oewfq+4jhz3n5=av6qesyb')
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY', 
+    'django-insecure--1pks29iyhmtof*z-9f6zsa7rov8oewfq+4jhz3n5=av6qesyb'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(os.environ.get('DEBUG', 0))
+DEBUG = int(os.environ.get('DEBUG', 1))
 
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost 127.0.0.1').split(' ')
+ALLOWED_HOSTS = os.environ.get(
+    'DJANGO_ALLOWED_HOSTS', 
+    'localhost 127.0.0.1'
+).split(' ')
 
 # Application definition
 
@@ -37,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'core',
     'api',
 ]
@@ -139,6 +146,13 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         'LOCATION': 'redis://localhost:6379',
     }
+}
+
+
+# Django Rest Framework settings.
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (),    # For development
 }
 
 
