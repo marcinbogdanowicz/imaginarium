@@ -11,7 +11,7 @@ class UserBaseSerializer(serializers.ModelSerializer):
         model = User
 
         fields = (
-            'id',
+            'pk',
             'username',
             'password',
             'first_name',
@@ -53,8 +53,33 @@ class UserPublicSerializer(UserBaseSerializer):
         model = User
 
         fields = (
-            'id',
+            'pk',
             'username',
             'email',
         )
     
+
+class ImageSerializer(serializers.ModelSerializer):
+    """
+    General serializer for uploaded images.
+    Must be used by authenticated users only.
+    """
+
+    class Meta:
+        model = Image
+
+        fields = (
+            'pk',
+            'image',
+        )
+
+    def create(self, validated_data):
+        # Appends request.user as owner of the image.
+        # Make sure this is not AnonymousUser instance.
+        request = self.context.get('request')
+        instance = Image.objects.create(
+            **validated_data,
+            owner=request.user
+        )
+        instance.save()
+        return instance

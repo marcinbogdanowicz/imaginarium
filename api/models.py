@@ -1,6 +1,6 @@
-from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from .utils import file_name_generator
 
 
 class ThumbnailSize(models.Model):
@@ -55,12 +55,14 @@ class User(AbstractUser):
             self.account_tier = AccountTier.get_default()
 
 
-image_storage = FileSystemStorage(location='/media/images')
-
 class Image(models.Model):
-    image = models.ImageField(upload_to=image_storage)
+    image = models.ImageField(
+        upload_to=file_name_generator
+    )
     owner = models.ForeignKey(
         User, 
         on_delete=models.CASCADE, 
         related_name='images'
     )
+
+
