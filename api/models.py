@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import FileExtensionValidator
 from .utils import file_name_generator
 
 
@@ -57,7 +58,11 @@ class User(AbstractUser):
 
 class Image(models.Model):
     image = models.ImageField(
-        upload_to=file_name_generator
+        upload_to=file_name_generator,
+        validators=[FileExtensionValidator(
+            allowed_extensions=('jpg', 'jpeg', 'png'),
+            message='Allowed file extensions: jpg/jpeg, png.'
+        )],
     )
     owner = models.ForeignKey(
         User, 

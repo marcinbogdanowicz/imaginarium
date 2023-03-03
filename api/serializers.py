@@ -76,8 +76,15 @@ class ImageSerializer(serializers.HyperlinkedModelSerializer):
 
         fields = (
             'pk',
+            'image',
             'url',
         )
+
+        extra_kwargs = {
+            'image': {
+                'write_only': True
+            }
+        }
 
     def create(self, validated_data):
         """
