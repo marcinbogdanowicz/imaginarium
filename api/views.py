@@ -9,7 +9,8 @@ from rest_framework.generics import (
 from .serializers import (
     UserPrivateSerializer,
     UserPublicSerializer,
-    ImageSerializer
+    ImageSerializer,
+    ImageDetailSerializer,
 )
 from .models import (
     User,
@@ -35,13 +36,10 @@ class UserDetailView(RetrieveUpdateDestroyAPIView):
 
     permission_classes = (custom_permissions.IsOwner,)
     serializer_class = UserPrivateSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        return User.objects.filter(pk=user.pk)
+    queryset = User.objects.all()
 
     def get_object(self):
-        obj = get_object_or_404(self.get_queryset(), pk=self.kwargs['user_pk'])
+        obj = get_object_or_404(self.get_queryset(), pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, obj)
         return obj
 
@@ -71,3 +69,18 @@ class ImageListUploadView(ListCreateAPIView):
         if user.is_authenticated:
             return Image.objects.filter(owner=user)
         return []
+    
+
+class ImageDetailView(RetrieveUpdateDestroyAPIView):
+    """
+    Shows details of an image. Available for image owner only.
+    """
+
+    permission_classes = (custom_permissions.IsOwner,)
+    serializer_class = ImageDetailSerializer
+    queryset = Image.objects.all()
+
+    def get_object(self):
+        obj = get_object_or_404(self.get_queryset(), pk=self.kwargs['pk'])
+        self.check_object_permissions(self.request, obj)
+        return obj

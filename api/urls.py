@@ -4,6 +4,7 @@ from .views import (
     UserDetailView,
     UserListView,
     ImageListUploadView,
+    ImageDetailView,
 )
 
 urlpatterns = [
@@ -22,7 +23,7 @@ urlpatterns = [
         name='user-create'
     ),
     path(
-        'user/<int:user_pk>/',
+        'user/<int:pk>/',
         UserDetailView.as_view(),
         name='user-detail'
     ),
@@ -30,5 +31,10 @@ urlpatterns = [
         'image/',
         ImageListUploadView.as_view(),
         name='image-list-upload'
+    ),
+    path(
+        'image/<int:pk>/',
+        ImageDetailView.as_view(),
+        name='image-detail'
     ),
 ]

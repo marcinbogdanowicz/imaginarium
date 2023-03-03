@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'sorl.thumbnail',
     'core',
     'api',
 ]
@@ -160,7 +161,13 @@ REST_FRAMEWORK = {
 }
 
 
-# Celery settings
+# Celery settings.
 
 CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379"
+
+
+# Sorl thumbnail settings.
+
+THUMBNAIL_KVSTORE = 'sorl.thumbnail.kvstores.dbm_kvstore.KVStore' # Dev only!
+

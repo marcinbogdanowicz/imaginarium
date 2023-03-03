@@ -65,4 +65,7 @@ class Image(models.Model):
         related_name='images'
     )
 
+    def __str__(self):
+        return f"Image {self.image.url}"
+
 
