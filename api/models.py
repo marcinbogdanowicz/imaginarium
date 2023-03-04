@@ -1,6 +1,12 @@
+from datetime import timedelta
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import FileExtensionValidator
+from django.core.validators import (
+    FileExtensionValidator,
+    MinValueValidator,
+    MaxValueValidator
+)
 from .utils import file_name_generator
 
 
@@ -72,5 +78,42 @@ class Image(models.Model):
 
     def __str__(self):
         return f"Image {self.image.url}"
+    
+
+class TempLink(models.Model):
+    token = models.CharField(max_length=45, unique=True)
+    image = models.ForeignKey(
+        Image, 
+        on_delete=models.CASCADE, 
+        related_name='templinks'
+    )
+    created = models.DateTimeField(auto_now_add=True)
+    expires_in = models.IntegerField(
+        validators=(
+            MinValueValidator(300),
+            MaxValueValidator(30000)
+        )
+    )
+    owner = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='temporary_links',
+        null=True,                                          # Dev only!
+    )
+
+    def expiration_date(self):
+        expires_in = timedelta(seconds=self.expires_in)
+        return (self.created + expires_in)
+
+    def has_expired(self):
+        return (timezone.now() >= self.expiration_date())
+    
+    def __str__(self):
+        return f"Templink ({'expired' if self.has_expired() else 'active'})"
+    
+
+class TempLinkTokenBlacklist(models.Model):
+    token = models.CharField(max_length=45, unique=True)
+
 
 

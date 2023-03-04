@@ -5,6 +5,8 @@ from .views import (
     UserListView,
     ImageListUploadView,
     ImageDetailView,
+    TempLinkListCreateView,
+    TemporaryImageView,
 )
 
 urlpatterns = [
@@ -36,5 +38,15 @@ urlpatterns = [
         'image/<int:pk>/',
         ImageDetailView.as_view(),
         name='image-detail'
+    ),
+    path(
+        'image/<int:image_pk>/templink/',
+        TempLinkListCreateView.as_view(),
+        name='templink-list-create'
+    ),
+    path(
+        'templink/<str:token>/',
+        TemporaryImageView.as_view(),
+        name='temporary-image-view'
     ),
 ]

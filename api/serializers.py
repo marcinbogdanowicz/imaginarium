@@ -1,6 +1,8 @@
+import datetime
 from rest_framework import serializers, exceptions
-from .models import User, Image
+from .models import User, Image, TempLink, TempLinkTokenBlacklist
 from sorl.thumbnail import get_thumbnail
+from .utils import generate_token
 
 
 class UserPrivateSerializer(serializers.ModelSerializer):
@@ -93,8 +95,7 @@ class ImageSerializer(serializers.HyperlinkedModelSerializer):
         request = self.context.get('request')
 
         # Make sure this was called by authenticated user.
-        assert (
-            request.user.is_authenticated, 
+        assert request.user.is_authenticated, (
             'Only authenticated users can upload images.'
         )
 
@@ -151,3 +152,65 @@ class ImageDetailSerializer(ImageSerializer):
             "Upload through ImageDetailSerializer is prohibited. " +
             "Use base image serializer instead."
         ))
+    
+
+class TempLinkSerializer(serializers.ModelSerializer):
+    """
+    Serializer for temporary links.
+    """
+
+    class Meta:
+        model = TempLink
+
+        fields = (
+            'token',
+            'image',
+            'created',
+            'expires_in',
+        )
+
+        extra_kwargs = {
+            'token': {
+                'read_only': True
+            },
+            'image': {
+                'read_only': True
+            }
+        }
+
+    def create(self, validated_data):
+        """
+        Creates new TempLink instance. Appends image owner as owner.
+        Generates url token.
+        """
+        
+        # Get image by pk url kwarg.
+        view = self.context.get('view')
+        image = Image.objects.get(pk=view.kwargs['image_pk'])
+
+        # Generate token.
+        token = generate_token()
+
+        # Create and save.
+        instance = TempLink.objects.create(
+            **validated_data,
+            token=token,
+            image=image,
+            owner=image.owner
+        )
+        instance.save()
+        return instance
+
+    def to_representation(self, instance):
+        """
+        Generate representation along with full URL instead of token.
+        """
+
+        request = self.context.get('request')
+        result = super().to_representation(instance)
+
+        # Transform token to URL.
+        result['token'] = request.build_absolute_uri((
+            '/api/templink/' + result['token']
+        ))
+        return result

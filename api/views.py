@@ -1,20 +1,26 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions
+from django.http import FileResponse
+from rest_framework import permissions, status
+from rest_framework.response import Response
 from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
+from rest_framework.views import APIView
 from .serializers import (
     UserPrivateSerializer,
     UserPublicSerializer,
     ImageSerializer,
     ImageDetailSerializer,
+    TempLinkSerializer,
 )
 from .models import (
     User,
-    Image
+    Image,
+    TempLink,
+    TempLinkTokenBlacklist,
 )
 from . import permissions as custom_permissions
 
@@ -84,3 +90,59 @@ class ImageDetailView(RetrieveUpdateDestroyAPIView):
         obj = get_object_or_404(self.get_queryset(), pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, obj)
         return obj
+
+
+class TempLinkListCreateView(ListCreateAPIView):
+    """
+    List and create temporary links. Only for image owner.
+    Generates tokens for new links via secrets.token_urlsafe.
+    """
+
+    serializer_class = TempLinkSerializer
+
+    def check_permissions(self, request):
+        """
+        Perform standard check and also verify if user is the owner
+        of the image he creates link to.
+        """
+        image = get_object_or_404(Image, pk=self.kwargs['image_pk'])
+        if request.user != image.owner:
+            self.permission_denied(
+                    request,
+                    message=('Only owners can view and create ' +
+                             'temporary links to their images.'),
+                    code='Denied'
+                )
+        return super().check_permissions(request)
+
+    def get_queryset(self):
+        image = get_object_or_404(Image, pk=self.kwargs['image_pk'])
+        queryset = TempLink.objects.filter(image=image)
+        return queryset
+    
+
+class TemporaryImageView(APIView):
+    """
+    Used for temporary links handling. Verifies that link has not expired
+    or removes expired one. Returns an image as binary content.
+    """
+
+    def get(self, request, token, format=None):
+        # Try to find TempLink associated with given URL token.
+        try:
+            templink = TempLink.objects.get(token=token)
+        except TempLink.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        # If token has expired, blacklist it and return.
+        if templink.has_expired():
+            TempLinkTokenBlacklist.objects.create(token=token)
+            templink.delete()
+            return Response(status=status.HTTP_410_GONE)
+        
+        # Return image as binary content.
+        filename = templink.image.image.path
+        return FileResponse(open(filename, 'rb'))
+
+
+        

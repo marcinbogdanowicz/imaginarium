@@ -14,3 +14,4 @@ class IsOwner(permissions.BasePermission):
         user = request.user
         owner = getattr(obj, 'owner', None)
         return (obj == user or owner == user)
+    
