@@ -10,8 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -163,11 +164,19 @@ REST_FRAMEWORK = {
 
 # Celery settings.
 
-CELERY_BROKER_URL = "redis://redis:6379"
-CELERY_RESULT_BACKEND = "redis://redis:6379"
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+CELERY_IMPORTS = ('imaginarium.tasks')
+CELERY_BEAT_SCHEDULE = {
+    # Run this task daily at 3 AM.
+    'remove-expired-templinks': {
+        'task': 'imaginarium.tasks.remove_expired_templink_tokens',
+        'schedule': crontab(minute=0, hour=3), 
+    },
+}
 
 
 # Sorl thumbnail settings.
 
-THUMBNAIL_KVSTORE = 'sorl.thumbnail.kvstores.dbm_kvstore.KVStore' # Dev only!
-
+THUMBNAIL_KVSTORE = 'sorl.thumbnail.kvstores.redis_kvstore.KVStore'
+THUMBNAIL_REDIS_URL = 'redis://redis:6379/1'
