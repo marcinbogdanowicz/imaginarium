@@ -184,11 +184,9 @@ class TempLinkSerializer(serializers.ModelSerializer):
         Generates url token.
         """
         
-        # Get image by pk url kwarg.
         view = self.context.get('view')
         image = Image.objects.get(pk=view.kwargs['image_pk'])
 
-        # Generate token.
         token = generate_token()
 
         # Create and save.

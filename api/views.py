@@ -95,10 +95,13 @@ class ImageDetailView(RetrieveUpdateDestroyAPIView):
 class TempLinkListCreateView(ListCreateAPIView):
     """
     List and create temporary links. Only for image owner.
-    Generates tokens for new links via secrets.token_urlsafe.
     """
 
     serializer_class = TempLinkSerializer
+    permission_classes = (
+        permissions.IsAuthenticated,
+        custom_permissions.CanCreateTempLinks
+    )
 
     def check_permissions(self, request):
         """

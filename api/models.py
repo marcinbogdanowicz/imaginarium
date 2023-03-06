@@ -24,7 +24,7 @@ class AccountTier(models.Model):
         related_name='tiers_using'
     )
     show_original = models.BooleanField(default=False)
-    generate_expiring_link = models.BooleanField(default=False)
+    can_generate_temp_link = models.BooleanField(default=False)
     default = models.BooleanField(default=False)
 
     def __str__(self):
