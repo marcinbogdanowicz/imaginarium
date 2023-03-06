@@ -1,6 +1,5 @@
 from django.urls import path, include
 from .views import (
-    UserCreateView,
     UserDetailView,
     UserListView,
     ImageListUploadView,
@@ -18,11 +17,6 @@ urlpatterns = [
         'user/',
         UserListView.as_view(),
         name='user-list'
-    ),
-    path(
-        'user/create/',
-        UserCreateView.as_view(),
-        name='user-create'
     ),
     path(
         'user/<int:pk>/',

@@ -1,14 +1,14 @@
-import datetime
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from rest_framework import serializers, exceptions
-from .models import User, Image, TempLink, TempLinkTokenBlacklist
+from .models import User, Image, TempLink
 from sorl.thumbnail import get_thumbnail
 from .utils import generate_token
 
 
 class UserPrivateSerializer(serializers.ModelSerializer):
     """
-    Serializer for creating user instance and showing account details
-    to that user.
+    Serializer for showing account details it's owner.
     """
 
     class Meta:
@@ -29,21 +29,6 @@ class UserPrivateSerializer(serializers.ModelSerializer):
                 'write_only': True
             }
         }
-
-    def create(self, validated_data):
-        """
-        Creates new user instance. Makes sure password is hashed
-        through django's set_password. Make sure account tier
-        is set to default if none was given.
-        """
-        password = validated_data.pop('password', None)
-        instance = User.objects.create(**validated_data)
-        if password is not None:
-            instance.set_password(password)
-        # Clean method will set default account tier if there is none.
-        instance.clean()
-        instance.save()
-        return instance
     
 
 class UserPublicSerializer(serializers.HyperlinkedModelSerializer):

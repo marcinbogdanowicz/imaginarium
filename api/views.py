@@ -3,7 +3,6 @@ from django.http import FileResponse
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.generics import (
-    CreateAPIView,
     ListAPIView,
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
@@ -23,15 +22,6 @@ from .models import (
     TempLinkTokenBlacklist,
 )
 from . import permissions as custom_permissions
-
-
-class UserCreateView(CreateAPIView):
-    """
-    Create a user instance.
-    """
-
-    permission_classes = (permissions.AllowAny,)
-    serializer_class = UserPrivateSerializer
 
 
 class UserDetailView(RetrieveUpdateDestroyAPIView):
