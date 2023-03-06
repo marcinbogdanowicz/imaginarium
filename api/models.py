@@ -35,6 +35,7 @@ class AccountTier(models.Model):
         return cls.objects.get(default=True)
     
     class Meta:
+        # Make sure there is only one default tier.
         constraints = [
             models.UniqueConstraint(
                 fields=['default'],
@@ -98,7 +99,6 @@ class TempLink(models.Model):
         User, 
         on_delete=models.CASCADE, 
         related_name='temporary_links',
-        null=True,                                          # Dev only!
     )
 
     def expiration_date(self):
