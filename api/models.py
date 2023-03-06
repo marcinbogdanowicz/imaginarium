@@ -11,7 +11,9 @@ from .utils import file_name_generator
 
 
 class ThumbnailSize(models.Model):
-    height = models.IntegerField()
+    height = models.IntegerField(
+        validators=[MinValueValidator(200), MaxValueValidator(4000)]
+    )
  
     def __str__(self):
         return f"height {self.height}px"
