@@ -10,25 +10,28 @@ def create_default_account_tiers(apps, schema_editor):
     two_hundred_px = ThumbnailSize.objects.create(height=200)
     four_hundred_px = ThumbnailSize.objects.create(height=400)
 
-    # Create account tiers.
-    basic = AccountTier.objects.create(
-        name='Basic',
-        default=True
-    )
-    basic.thumbnail_sizes.add(two_hundred_px)
+    # Create account tiers if they do not exist.
+    if not AccountTier.objects.filter(name='Basic'):
+        basic = AccountTier.objects.create(
+            name='Basic',
+            default=True
+        )
+        basic.thumbnail_sizes.add(two_hundred_px)
 
-    premium = AccountTier.objects.create(
-        name='Premium',
-        show_original=True
-    )
-    premium.thumbnail_sizes.add(two_hundred_px, four_hundred_px)
+    if not AccountTier.objects.filter(name='Premium'):
+        premium = AccountTier.objects.create(
+            name='Premium',
+            show_original=True
+        )
+        premium.thumbnail_sizes.add(two_hundred_px, four_hundred_px)
 
-    enterprise = AccountTier.objects.create(
-        name='Enterprise',
-        show_original=True,
-        can_generate_temp_link=True
-    )
-    enterprise.thumbnail_sizes.add(two_hundred_px, four_hundred_px)
+    if not AccountTier.objects.filter(name='Enterprise'):
+        enterprise = AccountTier.objects.create(
+            name='Enterprise',
+            show_original=True,
+            can_generate_temp_link=True
+        )
+        enterprise.thumbnail_sizes.add(two_hundred_px, four_hundred_px)
 
 
 class Migration(migrations.Migration):

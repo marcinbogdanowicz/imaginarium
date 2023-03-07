@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get(
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(os.environ.get('DEBUG', 1))
+DEBUG = int(os.environ.get('DEBUG', 0))
 
 ALLOWED_HOSTS = os.environ.get(
     'DJANGO_ALLOWED_HOSTS', 
@@ -145,16 +145,6 @@ MEDIA_ROOT = BASE_DIR / 'mediafiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Caching
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://localhost:6379',
-    }
-}
-
-
 # Django Rest Framework settings.
 
 REST_FRAMEWORK = {
@@ -167,6 +157,7 @@ REST_FRAMEWORK = {
 CELERY_BROKER_URL = "redis://redis:6379/0"
 CELERY_RESULT_BACKEND = "redis://redis:6379/0"
 CELERY_IMPORTS = ('imaginarium.tasks')
+CELERY_TIMEZONE = 'Europe/Warsaw'
 CELERY_BEAT_SCHEDULE = {
     # Run this task daily at 3 AM.
     'remove-expired-templinks': {

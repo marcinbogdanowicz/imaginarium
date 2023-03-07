@@ -120,6 +120,8 @@ class TemporaryImageView(APIView):
     or removes expired one. Returns an image as binary content.
     """
 
+    permission_classes = (permissions.AllowAny,)
+
     def get(self, request, token, format=None):
         # Try to find TempLink associated with given URL token.
         try:

@@ -15,6 +15,11 @@ class Command(CreateSuperUserCommand):
     def handle(self, *args, **kwargs):
         self.stdout.write('Creating admin (superuser)...')
 
+        # Check if admin user already exists.
+        if User.objects.filter(username='Admin'):
+            self.stdout.write('Admin already created.')
+            return 
+        
         username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'Admin')
         password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'imaginariumadmin')
         email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'noemail@example.com')
