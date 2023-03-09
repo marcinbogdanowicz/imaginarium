@@ -1,0 +1,12 @@
+**/media
+**/mediafiles
+**/staticfiles
+**/docker
+**/__pycache__
+**.pyc
+**/thumbnail_kvstore
+**/thumbnail_kvstore.lock
+**/db.sqlite3
+**/celerybeat-schedule
+**/docker-compose*
+**/README.md
