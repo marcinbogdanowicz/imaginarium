@@ -21,10 +21,10 @@ Routes:
 
 ## Development setup
 
-Development setup is based on Docker containers with bind mounts
-to project directory.
+Development setup is based on Django test server.
+Connection with local code is maintained via bind mounts.
 
-To run development containers:
+To spin development containers:
 ```
 cd ./imaginarium
 docker compose build
@@ -43,18 +43,41 @@ Development setup is based on env variables stored in
 
 ## Production setup
 
-To run production setup `cd` to main project directory:
+Production setup is based on nginx and gunicorn. Bind mounts were replaced
+with volumes.
+
+To spin production containers:
 ```
+cd ./imaginarium
 docker compose -f docker-compose.prod.yml build
 docker compose -f docker-compose.prod.yml up -d
 ```
 
-Site will be available at http://localhost/
+Site will be available at http://localhost/ (port 80).
 
 Admin credentials are the same as in development.
 
 For live preview nginx conatiner was replaced by nginx-proxy 
-and nginx acme companion to obtain and renew LetsEncrypt certificates.
+and nginx acme companion to obtain and renew LetsEncrypt SSL certificates.
+
+
+## Testing
+
+Test with Django's standard `python manage.py test`.
+No need to run tests within Docker containers.
+
+Make sure to `pip install` requirements either locally
+or in virtual enviroment before testing.
+
+
+## Tech stack:
+- Django
+- Django Rest Framework
+- Sorl thumbnail
+- Redis
+- Celery
+- Nginx
+- Docker
 
 
 
