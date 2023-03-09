@@ -1,5 +1,6 @@
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 from rest_framework import serializers, exceptions
 from .models import User, Image, TempLink
 from sorl.thumbnail import get_thumbnail
@@ -129,6 +130,14 @@ class ImageDetailSerializer(ImageSerializer):
             )
             result[f"thumbnail-{size.height}px"] = (
                 request.build_absolute_uri(thumbnail.url))
+            
+        # Add URL to temporary links.
+        if account.can_generate_temp_link:
+            relative_url = reverse(
+                'templink-list-create', 
+                kwargs={'image_pk': instance.pk}
+            )
+            result['templink'] = request.build_absolute_uri(relative_url)
         
         return result
     
@@ -141,23 +150,23 @@ class ImageDetailSerializer(ImageSerializer):
 
 class TempLinkSerializer(serializers.ModelSerializer):
     """
-    Serializer for temporary links.
+    Serializer for temporary links. Replaces token with full URL.
     """
+
+    link = serializers.URLField(read_only=True)
 
     class Meta:
         model = TempLink
 
         fields = (
-            'token',
+            'pk',
+            'link',
             'image',
             'created',
             'expires_in',
         )
 
         extra_kwargs = {
-            'token': {
-                'read_only': True
-            },
             'image': {
                 'read_only': True
             }
@@ -186,14 +195,14 @@ class TempLinkSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         """
-        Generate representation along with full URL instead of token.
+        Generate representation along with full URL.
         """
 
         request = self.context.get('request')
         result = super().to_representation(instance)
-
-        # Transform token to URL.
-        result['token'] = request.build_absolute_uri((
-            '/api/templink/' + result['token']
+        
+        # Add link.
+        result['link'] = request.build_absolute_uri((
+            f'/api/templink/{instance.token}/'
         ))
         return result

@@ -148,7 +148,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Django Rest Framework settings.
 
 REST_FRAMEWORK = {
-    'UPLOADED_FILES_USE_URL': True
+    'UPLOADED_FILES_USE_URL': True,
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ],
 }
 
 
